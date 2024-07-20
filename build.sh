@@ -1,10 +1,10 @@
 #! /bin/sh
-version="20.1-Nexus"
-source_img_name="CoreELEC-Amlogic-ng.arm-${version}-Generic"
+version="21.0-Omega"
+source_img_name="CoreELEC-Amlogic-ne.aarch64-${version}-Generic"
 source_img_file="${source_img_name}.img.gz"
 source_img_url="https://github.com/CoreELEC/CoreELEC/releases/download/${version}/${source_img_name}.img.gz"
-target_img_prefix="CoreELEC-Amlogic-ng.arm-${version}"
-target_img_name="${target_img_prefix}-E900V22C-$(date +%Y.%m.%d)"
+target_img_prefix="CoreELEC-Amlogic-ne.aarch64-${version}"
+target_img_name="${target_img_prefix}-4pro-$(date +%Y.%m.%d)"
 mount_point="target"
 common_files="common-files"
 system_root="SYSTEM-root"
@@ -14,7 +14,7 @@ libreelec_path="${system_root}/usr/lib/libreelec"
 config_path="${system_root}/usr/config"
 kodi_userdata="${mount_point}/.kodi/userdata"
 
-echo "Welcome to build CoreELEC for Skyworth E900V22C!"
+echo "Welcome to build CoreELEC for Tencent 4Pro!"
 echo "Downloading CoreELEC-${version} generic image"
 wget ${source_img_url} -O ${source_img_file} | exit 1
 echo "Decompressing CoreELEC image"
@@ -25,22 +25,14 @@ mkdir ${mount_point}
 echo "Mounting CoreELEC boot partition"
 sudo mount -o loop,offset=4194304 ${source_img_name}.img ${mount_point}
 
-echo "Copying E900V22C DTB file"
-sudo cp ${common_files}/e900v22c.dtb ${mount_point}/dtb.img
+echo "Copying 4Pro DTB file"
+sudo cp ${common_files}/4pro.dtb ${mount_point}/dtb.img
+
+echo "Copying 4Pro dovi.ko file"
+sudo cp ${common_files}/dovi.ko ${mount_point}/dovi.ko
 
 echo "Decompressing SYSTEM image"
 sudo unsquashfs -d ${system_root} ${mount_point}/SYSTEM
-
-echo "Copying modules-load conf for uwe5621ds"
-sudo cp ${common_files}/wifi_dummy.conf ${modules_load_path}/wifi_dummy.conf
-sudo chown root:root ${modules_load_path}/wifi_dummy.conf
-sudo chmod 0664 ${modules_load_path}/wifi_dummy.conf
-
-echo "Copying systemd service file for uwe5621ds"
-sudo cp ${common_files}/sprd_sdio-firmware-aml.service ${systemd_path}/sprd_sdio-firmware-aml.service
-sudo chown root:root ${systemd_path}/sprd_sdio-firmware-aml.service
-sudo chmod 0664 ${systemd_path}/sprd_sdio-firmware-aml.service
-sudo ln -s ../sprd_sdio-firmware-aml.service ${systemd_path}/multi-user.target.wants/sprd_sdio-firmware-aml.service
 
 echo "Copying fs-resize script"
 sudo cp ${common_files}/fs-resize ${libreelec_path}/fs-resize
@@ -51,9 +43,9 @@ echo "Copying rc_keymap files"
 sudo cp ${common_files}/rc_maps.cfg ${config_path}/rc_maps.cfg
 sudo chown root:root ${config_path}/rc_maps.cfg
 sudo chmod 0664 ${config_path}/rc_maps.cfg
-sudo cp ${common_files}/e900v22c.rc_keymap ${config_path}/rc_keymaps/e900v22c
-sudo chown root:root ${config_path}/rc_keymaps/e900v22c
-sudo chmod 0664 ${config_path}/rc_keymaps/e900v22c
+sudo cp ${common_files}/4pro.rc_keymap ${config_path}/rc_keymaps/4pro
+sudo chown root:root ${config_path}/rc_keymaps/4pro
+sudo chmod 0664 ${config_path}/rc_keymaps/4pro
 
 echo "Compressing SYSTEM image"
 sudo mksquashfs ${system_root} SYSTEM -comp lzo -Xalgorithm lzo1x_999 -Xcompression-level 9 -b 524288 -no-xattrs
